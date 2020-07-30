@@ -1,0 +1,39 @@
+
+version: '2.1'
+
+services:
+  block-chain-validator:
+    container_name: block-chain-validator
+    image: validator
+    ports:
+      - '0.0.0.0:4004:4004'
+      - '0.0.0.0:5050:5050'
+    entrypoint: "sawtooth-validator -vvv \
+                           --endpoint tcp://0.0.0.0:8800 \
+                           --bind component:tcp://0.0.0.0:4004 \
+                           --bind network:tcp://0.0.0.0:8800 \
+                           --bind consensus:tcp://0.0.0.0:5050"
+    stop_signal: SIGKILL
+
+  block-chain-rest-api:
+    container_name: rest-api2
+    image: rest-api
+    ports:
+      - '8008:8008'
+    depends_on:
+      - block-chain-validator
+    entrypoint: |
+      sawtooth-rest-api -vvv --connect tcp://block-chain-validator:4004 --bind 0.0.0.0:8008
+
+  block-chain-settings-tp:
+    image: settp
+    depends_on:
+      - block-chain-validator
+    command: settings-tp -vv --connect tcp://block-chain-validator:4004
+
+  block-chain-consenus:
+    image: consensus
+    depends_on:
+      - block-chain-validator
+    command: devmode-engine-rust --connect tcp://block-chain-validator:5050
+
