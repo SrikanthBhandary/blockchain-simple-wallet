@@ -5,7 +5,7 @@ colorlog==4.2.1
 idna==2.10
 protobuf==3.12.4
 pycparser==2.20
-PyYAML==5.3.1
+PyYAML==5.4
 pyzmq==19.0.1
 requests==2.24.0
 sawtooth-sdk==1.2.3
